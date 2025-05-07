@@ -1,90 +1,72 @@
-# 大乐透 AI 量化分析系统
+# 大乐透智能分析预测 / Super Lotto AI Analysis & Prediction
 
-这是一个基于 Next.js 14 开发的大乐透数据 AI 量化分析网站，用于收集和分析大乐透数据，并提供 AI 辅助预测。
+## 简介 / Introduction
 
-## 主要功能
+**中文：**
+本项目是一个大乐透彩票的分析和预测工具，旨在通过历史数据分析和 AI 智能算法，为用户提供数据参考和趋势预测，辅助用户进行决策。
 
-1. **数据收集**：允许用户上传他们已购买的大乐透彩票号码（最多 5 注）
-2. **数据验证**：严格验证用户提交的数据是否符合大乐透格式要求
-3. **IP 限制**：每个 IP 每小时最多提交 5 注数据
-4. **AI 分析**：在开奖前三小时，AI 会基于收集到的数据生成 20 注预测结果
-5. **结果展示**：所有用户均可查看 AI 生成的预测结果
+**English:**
+This project is an analysis and prediction tool for the Super Lotto lottery. It aims to provide users with data references and trend predictions through historical data analysis and AI intelligent algorithms to assist users in decision-making.
 
-## 使用须知
+## 主要功能 / Key Features
 
-- 只能提交随机购买的彩票号码，不接受自选号码或虚构数据
-- 不真实的数据会影响 AI 的分析结果，请务必提交真实数据
-- 每个用户每次最多可提交 5 注，每小时最多提交 5 注
+**中文：**
 
-## 技术栈
+- 历史数据展示：清晰展示往期大乐透的开奖号码、中奖情况等。
+- AI 智能预测：基于机器学习算法，对未来的开奖号码进行预测。
+- 开奖信息：实时更新最新的开奖结果。
+- 新人引导：为新用户提供友好的使用指引和功能介绍。
 
-- Next.js 14 (App Router)
-- React 19
+**English:**
+
+- Historical Data Display: Clearly display past Super Lotto draw numbers, prize information, etc.
+- AI Smart Prediction: Predict future draw numbers based on machine learning algorithms.
+- Draw Information: Real-time updates of the latest lottery results.
+- New User Onboarding: Provide friendly usage guidance and feature introductions for new users.
+
+## 技术栈 / Tech Stack
+
+- Next.js
+- React
 - TypeScript
 - Tailwind CSS
-- Server Actions (用于服务器端数据处理)
+- Node.js (for backend APIs if any)
+- Python (for AI/ML models if any)
 
-## 开发指南
+## 安装与启动 / Setup and Run
 
-### 安装依赖
+**中文：**
 
 ```bash
+# 安装依赖
 npm install
-```
 
-### 运行开发服务器
-
-```bash
+# 启动开发服务器
 npm run dev
 ```
 
-访问 [http://localhost:3000](http://localhost:3000) 查看网站。
-
-### 构建生产版本
+**English:**
 
 ```bash
-npm run build
-```
+# Install dependencies
+npm install
 
-### 启动生产服务器
-
-```bash
-npm start
-```
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 使用说明 / Usage
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**中文：**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1.  通过导航栏访问不同的功能模块，如“历史数据”、“AI 预测”等。
+2.  在“历史数据”中查看往期开奖详情。
+3.  在“AI 预测”中获取基于算法的号码建议。
+4.  关注“开奖信息”获取最新结果。
 
-## Learn More
+**English:**
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  Access different functional modules such as "Historical Data", "AI Prediction", etc., through the navigation bar.
+2.  View details of past draws in "Historical Data".
+3.  Get algorithm-based number suggestions in "AI Prediction".
+4.  Follow "Draw Information" for the latest results.
