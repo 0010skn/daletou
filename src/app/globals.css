@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 10, 10, 10;
+  --background-end-rgb: 20, 20, 20;
+  --gold: 255, 215, 0;
+  --gold-light: 255, 223, 80;
+  --gold-dark: 184, 134, 11;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--background-start-rgb)),
+    rgb(var(--background-end-rgb))
+  );
+  min-height: 100vh;
+}
+
+/* 深色模式全局样式 */
+.dark {
+  color-scheme: dark;
+}
+
+/* NextUI输入框覆盖样式 */
+.nextui-c-hzQjrs, /* Input基础容器 */
+.nextui-c-PJLV-igdSepI-css, /* Input组件背景 */
+.nextui-input-block-label, /* 包含标签的Input */
+[data-slot="input-wrapper"],
+[data-slot="input-base"],
+[data-slot="inner-wrapper"],
+[data-slot="input"] {
+  background-color: #121212 !important;
+  color: #ffd700 !important;
+}
+
+/* 文本域样式覆盖 */
+textarea.nextui-c-hhqeOJ {
+  background-color: #121212 !important;
+  color: #ffd700 !important;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-gold {
+    color: rgb(var(--gold));
+  }
+
+  .bg-dark {
+    background-color: rgb(20, 20, 20);
+  }
+
+  .bg-darker {
+    background-color: rgb(10, 10, 10);
+  }
+
+  .border-gold {
+    border-color: rgb(var(--gold));
+  }
+
+  .gold-gradient {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 215, 0, 0.8),
+      rgba(184, 134, 11, 0.8)
+    );
+  }
+
+  .gold-shadow {
+    box-shadow: 0 0 15px rgba(var(--gold), 0.3);
+  }
+
+  .gold-glow:hover {
+    box-shadow: 0 0 20px rgba(var(--gold), 0.5);
+    transition: all 0.3s ease;
+  }
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    rgb(var(--gold)),
+    rgb(var(--gold-dark))
+  );
+  border-radius: 4px;
+}
+
+/* 组件通用样式 */
+.card {
+  @apply bg-dark rounded-lg p-6 border border-opacity-20 border-gold gold-shadow;
+}
+
+.gold-button {
+  @apply bg-gradient-to-r from-yellow-500 to-amber-700 text-black font-bold py-2 px-4 rounded transition-all duration-300 gold-glow;
+}
+
+.gold-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-600;
+}
