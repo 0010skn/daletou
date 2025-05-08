@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  next-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    # Add any necessary environment variables here
+    # environment:
+    #   NODE_ENV: production
+    #   MY_API_KEY: your_api_key_here
+    restart: unless-stopped
