@@ -211,3 +211,49 @@ export const eventBus = {
     }
   },
 };
+
+// 解析开奖号码字符串，返回红球和蓝球数组
+export function parseLotteryNumbers(lotteryDrawResult: string): {
+  redBalls: string[];
+  blueBalls: string[];
+} {
+  if (!lotteryDrawResult || typeof lotteryDrawResult !== "string") {
+    return { redBalls: [], blueBalls: [] };
+  }
+  // 移除所有非数字和非+号的字符，以兼容 "0102030405+0607" 或 "01 02 03 04 05 + 06 07" 等格式
+  const cleanedString = lotteryDrawResult.replace(/[^\d+]/g, "");
+
+  if (cleanedString.includes("+")) {
+    const parts = cleanedString.split("+");
+    const redPart = parts[0];
+    const bluePart = parts[1];
+    const redBalls: string[] = [];
+    const blueBalls: string[] = [];
+    for (let i = 0; i < redPart.length; i += 2) {
+      redBalls.push(redPart.substring(i, i + 2));
+    }
+    for (let i = 0; i < bluePart.length; i += 2) {
+      blueBalls.push(bluePart.substring(i, i + 2));
+    }
+    // 确保红球和蓝球数量正确
+    if (redBalls.length === 5 && blueBalls.length === 2) {
+      return { redBalls, blueBalls };
+    }
+  }
+
+  // 如果不是 "+" 分隔的格式，或者解析失败，尝试空格分隔
+  const numbers = lotteryDrawResult
+    .trim()
+    .split(/\s+/)
+    .filter((n) => n !== "+"); // 移除可能存在的单独的 '+'
+  const redBalls = numbers.slice(0, 5);
+  const blueBalls = numbers.slice(5, 7);
+  // 再次校验，以防原始逻辑处理的是正确格式但被上面的逻辑错误处理
+  if (redBalls.length === 5 && blueBalls.length === 2) {
+    return { redBalls, blueBalls };
+  }
+
+  // 如果两种方式都无法正确解析，返回空数组
+  return { redBalls: [], blueBalls: [] };
+  return { redBalls, blueBalls };
+}

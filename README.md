@@ -8,6 +8,8 @@
 **English:**
 This project is an analysis and prediction tool for the Super Lotto lottery. It aims to provide users with data references and trend predictions through historical data analysis and AI intelligent algorithms to assist users in decision-making.
 
+![项目预览](public/preview.jpeg)
+
 ## 主要功能 / Key Features
 
 **中文：**

@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getCurrentDrawNumber, formatLotteryNumber } from "@/lib/utils";
+import { formatLotteryNumber, parseLotteryNumbers } from "@/lib/utils"; //移除了 getCurrentDrawNumber
 import { getAiAnalysisResult } from "@/app/server/data";
 import { GraphIcon } from "./icons";
+import NumberBall from "./icons/NumberBall"; // 导入 NumberBall 组件
 
-export default function AIResults() {
+interface AIResultsProps {
+  currentDrawNumber: string;
+}
+
+export default function AIResults({ currentDrawNumber }: AIResultsProps) {
   const [results, setResults] = useState<string[]>([]);
-  const currentDrawNumber = getCurrentDrawNumber();
 
   useEffect(() => {
     console.log(
@@ -146,18 +150,30 @@ export default function AIResults() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {results.map((result, index) => {
-              // 格式化号码显示
-              const formattedResult = formatLotteryNumber(result);
+              const { redBalls, blueBalls } = parseLotteryNumbers(result);
 
               return (
                 <div
                   key={index}
-                  className="p-3 border border-gold-700/30 rounded-lg bg-dark-900 flex items-center justify-between group hover:border-gold-500/70 transition-all"
+                  className="p-3 border border-gold-700/30 rounded-lg bg-dark-900 flex flex-col items-start group hover:border-gold-500/70 transition-all"
                 >
-                  <span className="text-white font-mono font-medium">
-                    {formattedResult}
-                  </span>
-                  <span className="text-gold-500 text-xs opacity-70 group-hover:opacity-100">
+                  <div className="flex items-center gap-1 mb-1">
+                    {redBalls.map((ball, ballIndex) => (
+                      <NumberBall
+                        key={`red-${index}-${ballIndex}`}
+                        number={ball}
+                        color="red"
+                      />
+                    ))}
+                    {blueBalls.map((ball, ballIndex) => (
+                      <NumberBall
+                        key={`blue-${index}-${ballIndex}`}
+                        number={ball}
+                        color="blue"
+                      />
+                    ))}
+                  </div>
+                  <span className="text-gold-500 text-xs opacity-70 group-hover:opacity-100 self-end">
                     #{index + 1}
                   </span>
                 </div>

@@ -5,6 +5,7 @@ import LotteryForm from "@/components/LotteryForm";
 import AIResults from "@/components/AIResults";
 import HistoricalPredictions from "@/components/HistoricalPredictions";
 import DrawInfo from "@/components/DrawInfo";
+import HistoricalDraws from "@/components/HistoricalDraws"; // 导入 HistoricalDraws
 import { CrownIcon } from "@/components/icons";
 import OnboardingGuide from "@/components/OnboardingGuide"; // 导入 OnboardingGuide
 import { useOnboardingCache } from "@/lib/onboardingCache"; // 导入 useOnboardingCache
@@ -36,6 +37,11 @@ export default function Home() {
   } = useOnboardingCache();
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [currentDrawNumber, setCurrentDrawNumber] = useState<string>(""); // 新增状态存储期号
+
+  const handleDrawNumberChange = (drawNumber: string) => {
+    setCurrentDrawNumber(drawNumber);
+  };
 
   useEffect(() => {
     setIsClient(true); // 确保只在客户端执行
@@ -82,15 +88,20 @@ export default function Home() {
       </header>
 
       <main className="container mx-auto space-y-8 md:space-y-12">
-        <DrawInfo />
+        <DrawInfo onDrawNumberChange={handleDrawNumberChange} />
         <div id="lottery-form-section">
           <LotteryForm />
         </div>
         <div id="ai-results-section">
-          <AIResults />
+          <AIResults currentDrawNumber={currentDrawNumber} />
         </div>
         <div id="historical-predictions-section">
           <HistoricalPredictions />
+        </div>
+        <div id="historical-draws-section">
+          {" "}
+          {/* 为新组件添加一个ID */}
+          <HistoricalDraws />
         </div>
       </main>
 

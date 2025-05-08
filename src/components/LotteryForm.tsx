@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button, Textarea } from "@nextui-org/react";
 import { submitLotteryData } from "@/app/actions";
-import { LotteryFormSchema, eventBus } from "@/lib/utils";
+import { LotteryFormSchema, eventBus, parseLotteryNumbers } from "@/lib/utils";
 import { LotteryIcon } from "./icons";
+import NumberBall from "./icons/NumberBall"; // 导入 NumberBall 组件
 
 type FormData = z.infer<typeof LotteryFormSchema>;
+
+interface ParsedTicket {
+  red: string[];
+  blue: string[];
+  originalLine: string; // 保留原始行以便调试或特定显示
+  isValid: boolean;
+}
 
 export default function LotteryForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,11 +28,15 @@ export default function LotteryForm() {
   const [showModal, setShowModal] = useState(false);
   const [isAgreed, setIsAgreed] = useState(false);
   const [pendingData, setPendingData] = useState<FormData | null>(null);
+  const [parsedTicketsPreview, setParsedTicketsPreview] = useState<
+    ParsedTicket[]
+  >([]);
 
   const {
     register,
     handleSubmit,
     reset,
+    control, // 添加 control 用于 useWatch
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(LotteryFormSchema),
@@ -32,6 +44,40 @@ export default function LotteryForm() {
       tickets: "",
     },
   });
+
+  const ticketsValue = useWatch({ control, name: "tickets" });
+
+  const parseSingleTicketString = (ticketString: string): ParsedTicket => {
+    const originalLine = ticketString.trim();
+    if (!originalLine) {
+      return { red: [], blue: [], originalLine, isValid: false };
+    }
+
+    // 尝试将 "0102030405+0607" 或 "01 02 03 04 05 + 06 07" 转换为 "01 02 03 04 05 06 07"
+    // 直接将原始行传递给 parseLotteryNumbers，它能处理多种格式
+    const { redBalls, blueBalls } = parseLotteryNumbers(originalLine);
+
+    const isValid = redBalls.length === 5 && blueBalls.length === 2;
+
+    return {
+      red: isValid ? redBalls : [],
+      blue: isValid ? blueBalls : [],
+      originalLine,
+      isValid,
+    };
+  };
+
+  useEffect(() => {
+    if (typeof ticketsValue === "string") {
+      const lines = ticketsValue.split("\n");
+      const parsed = lines
+        .map((line) => parseSingleTicketString(line))
+        .filter((p) => p.originalLine !== ""); // 过滤掉完全空行产生的解析结果
+      setParsedTicketsPreview(parsed);
+    } else {
+      setParsedTicketsPreview([]);
+    }
+  }, [ticketsValue]);
 
   const onSubmit = async (data: FormData) => {
     setPendingData(data);
@@ -131,6 +177,47 @@ export default function LotteryForm() {
             </p>
           )}
         </div>
+
+        {/* 号码预览区域 */}
+        {parsedTicketsPreview.length > 0 && (
+          <div className="mt-4 p-3 bg-dark-800 border border-gold-700/30 rounded-md">
+            <h4 className="text-md font-semibold text-gold-300 mb-2">
+              号码预览:
+            </h4>
+            {parsedTicketsPreview.map((ticket, index) => (
+              <div
+                key={index}
+                className={`mb-2 p-2 rounded ${
+                  ticket.isValid ? "bg-dark-900" : "bg-red-900/30"
+                }`}
+              >
+                {ticket.isValid ? (
+                  <div className="flex items-center gap-1">
+                    {ticket.red.map((num, rIndex) => (
+                      <NumberBall
+                        key={`preview-red-${index}-${rIndex}`}
+                        number={num}
+                        color="red"
+                      />
+                    ))}
+                    <span className="mx-1 text-gray-400">+</span>
+                    {ticket.blue.map((num, bIndex) => (
+                      <NumberBall
+                        key={`preview-blue-${index}-${bIndex}`}
+                        number={num}
+                        color="blue"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-red-400">
+                    第 {index + 1} 行格式无效: "{ticket.originalLine}"
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         <Button
           type="submit"

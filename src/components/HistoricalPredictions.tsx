@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import NumberBall from "./icons/NumberBall"; // 导入 NumberBall 组件
+import { parseLotteryNumbers } from "@/lib/utils";
 
 interface HistoricalPrediction {
   predictionDate: string; // YYYYMMDD 格式的日期
-  predictedNumbers: string[];
+  predictedNumbers: string[]; // 数组中的每个字符串是 "红球+蓝球" 格式
   // predictionType: "user" | "ai"; // 根据后端返回的数据结构，这里可能不需要
 }
 
@@ -86,15 +88,34 @@ const HistoricalPredictions = () => {
                   className="border-b border-gold-700/20 hover:bg-dark-800/60 transition-colors"
                 >
                   <td className="py-3 px-4">{prediction.predictionDate}</td>
-                  <td className="py-3 px-4 font-mono">
-                    {prediction.predictedNumbers.map((numSet, setIndex) => (
-                      <span
-                        key={setIndex}
-                        className="block sm:inline-block mr-2 mb-1 sm:mb-0 p-1 px-2 border border-gold-600/30 rounded bg-dark-800 text-gold-400 text-sm"
-                      >
-                        {Array.isArray(numSet) ? numSet.join(", ") : numSet}
-                      </span>
-                    ))}
+                  <td className="py-3 px-4">
+                    <div className="flex flex-col gap-2">
+                      {prediction.predictedNumbers.map((numSet, setIndex) => {
+                        const { redBalls, blueBalls } =
+                          parseLotteryNumbers(numSet);
+                        return (
+                          <div
+                            key={setIndex}
+                            className="flex items-center gap-1"
+                          >
+                            {redBalls.map((ball, ballIndex) => (
+                              <NumberBall
+                                key={`red-${setIndex}-${ballIndex}`}
+                                number={ball}
+                                color="red"
+                              />
+                            ))}
+                            {blueBalls.map((ball, ballIndex) => (
+                              <NumberBall
+                                key={`blue-${setIndex}-${ballIndex}`}
+                                number={ball}
+                                color="blue"
+                              />
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </td>
                   {/* <td className="py-3 px-4">{prediction.drawNumber}</td> */}
                 </tr>

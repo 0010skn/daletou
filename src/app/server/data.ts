@@ -2,7 +2,7 @@
 
 import fs from "fs-extra";
 import path from "path";
-import { getCurrentDrawNumber } from "@/lib/utils";
+// import { getCurrentDrawNumber } from "@/lib/utils"; // 移除本地期号计算
 
 // 保存大乐透数据到文件
 export async function saveLotteryData(
@@ -10,6 +10,36 @@ export async function saveLotteryData(
   ip: string
 ): Promise<{ success: boolean; message: string }> {
   try {
+    // 从第三方 API 获取最新的开奖数据以确定期号
+    let currentDrawNumber;
+    try {
+      const lotteryApiUrl =
+        "https://webapi.sporttery.cn/gateway/lottery/getHistoryPageListV1.qry?gameNo=85&provinceId=0&pageSize=1&isVerify=1&pageNo=1";
+      const lotteryResponse = await fetch(lotteryApiUrl, {
+        cache: "no-store", // 禁用 fetch 缓存，确保实时性
+      });
+      if (!lotteryResponse.ok) {
+        throw new Error(
+          `获取最新开奖数据失败: ${lotteryResponse.status} ${lotteryResponse.statusText}`
+        );
+      }
+      const lotteryData = await lotteryResponse.json();
+      const lastPoolDrawData = lotteryData?.value?.lastPoolDraw;
+
+      if (!lastPoolDrawData || !lastPoolDrawData.lotteryDrawNum) {
+        throw new Error(
+          "未能从API响应中获取完整的 lastPoolDraw 数据或 lotteryDrawNum"
+        );
+      }
+      currentDrawNumber = lastPoolDrawData.lotteryDrawNum;
+    } catch (apiError) {
+      console.error("保存数据前从第三方API获取开奖数据失败:", apiError);
+      return {
+        success: false,
+        message: "获取最新期号失败，无法保存数据，请稍后再试。",
+      };
+    }
+
     // 创建数据目录（如果不存在）
     const dataDir = path.join(process.cwd(), "data");
     await fs.ensureDir(dataDir);
@@ -54,8 +84,7 @@ export async function saveLotteryData(
       .split("\n")
       .filter((line) => line.trim() !== "");
 
-    // 获取当前期号
-    const currentDrawNumber = getCurrentDrawNumber();
+    // 使用从API获取的期号构建文件名
     const outputFile = path.join(dataDir, `${currentDrawNumber}.txt`);
 
     // 将数据追加到文件
@@ -91,7 +120,46 @@ export async function saveLotteryData(
 // 获取AI分析结果
 export async function getAiAnalysisResult(): Promise<string[]> {
   try {
-    const currentDrawNumber = getCurrentDrawNumber();
+    // 从第三方 API 获取最新的开奖数据以确定期号
+    let currentDrawNumber;
+    try {
+      const lotteryApiUrl =
+        "https://webapi.sporttery.cn/gateway/lottery/getHistoryPageListV1.qry?gameNo=85&provinceId=0&pageSize=1&isVerify=1&pageNo=1";
+      const lotteryResponse = await fetch(lotteryApiUrl, {
+        cache: "no-store", // 禁用 fetch 缓存，确保实时性
+      });
+      if (!lotteryResponse.ok) {
+        throw new Error(
+          `获取最新开奖数据失败: ${lotteryResponse.status} ${lotteryResponse.statusText}`
+        );
+      }
+      const lotteryData = await lotteryResponse.json();
+      const lastPoolDrawData = lotteryData?.value?.lastPoolDraw;
+
+      if (!lastPoolDrawData || !lastPoolDrawData.lotteryDrawNum) {
+        throw new Error(
+          "未能从API响应中获取完整的 lastPoolDraw 数据或 lotteryDrawNum"
+        );
+      }
+      currentDrawNumber = lastPoolDrawData.lotteryDrawNum;
+    } catch (apiError) {
+      console.error("获取AI结果前从第三方API获取开奖数据失败:", apiError);
+      // 如果无法获取期号，可以尝试返回示例结果或空数组
+      const exampleFile = path.join(
+        process.cwd(),
+        "data",
+        "example_result.txt"
+      );
+      if (await fs.pathExists(exampleFile)) {
+        const content = await fs.readFile(exampleFile, "utf-8");
+        return content
+          .trim()
+          .split("\n")
+          .filter((line) => line.trim() !== "");
+      }
+      return [];
+    }
+
     const resultFile = path.join(
       process.cwd(),
       "data",
