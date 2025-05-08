@@ -125,10 +125,9 @@ export async function getAiAnalysisResult(): Promise<string[]> {
 
 // 定义历史预测数据结构
 export interface HistoricalPrediction {
-  drawNumber: string; // 期号
+  predictionDate: string; // 预测日期 (YYYYMMDD)
   predictedNumbers: string[]; // 预测号码数组
   predictionType: "user" | "ai"; // 预测类型
-  predictionDate: string; // 预测日期 (从文件名中提取期号作为日期)
   // actualNumbers?: string[]; // 实际开奖号码 (当前系统未存储)
 }
 
@@ -154,30 +153,30 @@ export async function getHistoricalPredictions(): Promise<
 
       // 只处理文件，忽略目录
       if (stat.isFile()) {
-        // 过滤掉包含 "example" 的文件名
-        if (file.includes("example")) {
+        // 过滤掉包含 "example" 或 "ip_records.json" 的文件名
+        if (file.includes("example") || file.includes("ip_records.json")) {
           continue; // 跳过此文件
         }
         const fileName = path.basename(file, ".txt"); // 移除 .txt 后缀
-        let drawNumber = "";
+        let predictionDate = "";
         let predictionType: "user" | "ai" | null = null;
 
-        // 检查是否为AI结果文件，例如 2023001_result.txt
-        if (fileName.endsWith("_result")) {
-          drawNumber = fileName.substring(
-            0,
-            fileName.length - "_result".length
-          );
+        // 检查是否为AI结果文件，例如 20250507_result.txt
+        const aiResultMatch = fileName.match(/^(\d{8})_result$/);
+        if (aiResultMatch) {
+          predictionDate = aiResultMatch[1];
           predictionType = "ai";
         }
-        // 检查是否为用户提交文件，例如 2023001.txt
-        // 需要确保不是 _result 文件，并且文件名是纯数字（或符合期号格式）
-        else if (/^\d+$/.test(fileName)) {
-          drawNumber = fileName;
+        // 检查是否为用户提交文件，例如 20250507.txt
+        // 需要确保文件名是8位纯数字 (YYYYMMDD)
+        else if (/^\d{8}$/.test(fileName)) {
+          predictionDate = fileName;
           predictionType = "user";
         }
 
-        if (drawNumber && predictionType) {
+        // 根据任务要求，我们只处理AI预测结果以填充历史记录
+        // 如果需要同时处理用户提交的数据，这里的逻辑需要调整
+        if (predictionDate && predictionType === "ai") {
           try {
             const content = await fs.readFile(filePath, "utf-8");
             const predictedNumbers = content
@@ -187,10 +186,9 @@ export async function getHistoricalPredictions(): Promise<
 
             if (predictedNumbers.length > 0) {
               historicalData.push({
-                drawNumber,
+                predictionDate,
                 predictedNumbers,
                 predictionType,
-                predictionDate: drawNumber, // 使用期号作为大致的预测日期
               });
             }
           } catch (readError) {
@@ -205,8 +203,10 @@ export async function getHistoricalPredictions(): Promise<
     // 在发生错误时返回空数组或进行更复杂的错误处理
   }
 
-  // 按期号降序排序
-  historicalData.sort((a, b) => b.drawNumber.localeCompare(a.drawNumber));
+  // 按预测日期降序排序
+  historicalData.sort((a, b) =>
+    b.predictionDate.localeCompare(a.predictionDate)
+  );
 
   return historicalData;
 }

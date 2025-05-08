@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 
 interface HistoricalPrediction {
-  drawNumber: string;
+  predictionDate: string; // YYYYMMDD 格式的日期
   predictedNumbers: string[];
-  // predictionType: "user" | "ai"; // 移除 predictionType
-  predictionDate: string;
+  // predictionType: "user" | "ai"; // 根据后端返回的数据结构，这里可能不需要
 }
 
 const HistoricalPredictions = () => {
@@ -75,18 +74,18 @@ const HistoricalPredictions = () => {
           <table className="min-w-full bg-dark-900 shadow-md rounded-lg border border-gold-700/30">
             <thead className="bg-dark-800 text-gold-300">
               <tr>
-                <th className="py-3 px-4 text-left font-semibold">期号</th>
-                <th className="py-3 px-4 text-left font-semibold">预测号码</th>
                 <th className="py-3 px-4 text-left font-semibold">预测日期</th>
+                <th className="py-3 px-4 text-left font-semibold">预测号码</th>
+                {/* <th className="py-3 px-4 text-left font-semibold">原始ID</th> */}
               </tr>
             </thead>
             <tbody className="text-gray-300">
               {predictions.map((prediction, index) => (
                 <tr
-                  key={`${prediction.drawNumber}-${prediction.predictionDate}-${index}`} // 确保 key 的唯一性
+                  key={`${prediction.predictionDate}-${index}`} // 使用 predictionDate 作为 key 的一部分
                   className="border-b border-gold-700/20 hover:bg-dark-800/60 transition-colors"
                 >
-                  <td className="py-3 px-4">{prediction.drawNumber}</td>
+                  <td className="py-3 px-4">{prediction.predictionDate}</td>
                   <td className="py-3 px-4 font-mono">
                     {prediction.predictedNumbers.map((numSet, setIndex) => (
                       <span
@@ -97,7 +96,7 @@ const HistoricalPredictions = () => {
                       </span>
                     ))}
                   </td>
-                  <td className="py-3 px-4">{prediction.predictionDate}</td>
+                  {/* <td className="py-3 px-4">{prediction.drawNumber}</td> */}
                 </tr>
               ))}
             </tbody>

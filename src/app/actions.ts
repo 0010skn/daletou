@@ -1,9 +1,11 @@
 "use server";
 
+import net from "net";
 import { revalidatePath } from "next/cache";
 import { saveLotteryData } from "./server/data";
 import { headers } from "next/headers";
 import { invalidateCache } from "@/lib/cache";
+import { LotteryFormSchema } from "@/lib/utils"; // 导入 LotteryFormSchema
 
 // 处理大乐透数据提交
 export async function submitLotteryData(formData: FormData) {
@@ -18,10 +20,24 @@ export async function submitLotteryData(formData: FormData) {
       };
     }
 
+    // 使用 LotteryFormSchema 验证 tickets
+    const validationResult = LotteryFormSchema.safeParse({ tickets });
+
+    if (!validationResult.success) {
+      return {
+        success: false,
+        message:
+          "提交的彩票号码不符合规则，请检查每注号码的格式、数字范围及数量。",
+        errors: validationResult.error.flatten().fieldErrors,
+      };
+    }
+
     // 获取真实IP
     const ip = await getClientIP();
 
     // 保存数据
+    // 注意：这里我们传递原始的 tickets 字符串，而不是验证结果中的数据
+    // 因为 saveLotteryData 函数期望接收原始的字符串格式
     const result = await saveLotteryData(tickets, ip);
 
     // 清除API数据缓存，确保下次访问能看到最新的数据
@@ -40,6 +56,12 @@ export async function submitLotteryData(formData: FormData) {
   }
 }
 
+// IMPORTANT: In a production environment behind a trusted reverse proxy (e.g., Nginx, Cloudflare),
+// it's crucial to configure the application to trust and prioritize specific headers
+// set by that proxy (e.g., 'CF-Connecting-IP' for Cloudflare, or the first IP in a
+// correctly configured 'X-Forwarded-For' chain).
+// The current list and order of headers is a general approach and might need
+// adjustment based on the actual deployment architecture to prevent IP spoofing.
 // 获取客户端IP地址的函数
 async function getClientIP(): Promise<string> {
   try {
@@ -57,10 +79,13 @@ async function getClientIP(): Promise<string> {
     if (xForwardedFor) {
       // X-Forwarded-For可能包含多个IP，以逗号分隔，第一个是最初的客户端IP
       const ips = xForwardedFor.split(",").map((ip: string) => ip.trim());
-      const clientIP = ips[0];
-      if (isValidIP(clientIP)) {
-        console.log(`获取到IPv4/IPv6地址(x-forwarded-for): ${clientIP}`);
-        return clientIP;
+      if (ips.length > 0) {
+        // 确保ips数组不为空
+        const clientIP = ips[0]; // 获取数组的第一个元素
+        if (clientIP && isValidIP(clientIP)) {
+          console.log(`获取到IPv4/IPv6地址(x-forwarded-for): ${clientIP}`);
+          return clientIP;
+        }
       }
     }
 
@@ -107,31 +132,7 @@ async function getClientIP(): Promise<string> {
 
 // 验证IP地址函数
 function isValidIP(ip: string): boolean {
-  // 检查是否为空
   if (!ip) return false;
-
-  // 本地地址特殊处理
-  if (ip === "::1" || ip === "localhost" || ip === "127.0.0.1") {
-    return true;
-  }
-
-  // IPv4地址验证
-  const ipv4Pattern = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
-  if (ipv4Pattern.test(ip)) {
-    // 检查每个段是否在0-255范围内
-    const parts = ip.split(".");
-    return parts.every((part) => {
-      const num = parseInt(part, 10);
-      return num >= 0 && num <= 255;
-    });
-  }
-
-  // IPv6地址验证（简化版）
-  if (ip.includes(":")) {
-    // 最简单的IPv6验证，只检查格式
-    // 允许 2001:db8::1 这种缩写形式和完整形式
-    return true;
-  }
-
-  return false;
+  const ipVersion = net.isIP(ip);
+  return ipVersion === 4 || ipVersion === 6;
 }
