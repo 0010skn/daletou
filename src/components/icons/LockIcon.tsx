@@ -1,13 +1,12 @@
-import React from "react";
+import { IconProps } from ".";
 
-interface IconProps {
-  className?: string;
-}
-
-export default function LockIcon({ className }: IconProps) {
+export const LockIcon = ({ className = "" }: IconProps) => {
   return (
     <svg
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
+      width="24"
+      height="24"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -19,4 +18,6 @@ export default function LockIcon({ className }: IconProps) {
       <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
     </svg>
   );
-}
+};
+
+export default LockIcon;

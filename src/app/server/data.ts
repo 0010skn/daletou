@@ -3,8 +3,6 @@
 import fs from "fs-extra";
 import path from "path";
 import crypto from "crypto";
-// import { getCurrentDrawNumber } from "@/lib/utils"; // 移除本地期号计算
-
 // 保存大乐透数据到文件
 export async function saveLotteryData(
   data: string,

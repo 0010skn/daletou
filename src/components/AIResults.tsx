@@ -8,6 +8,7 @@ import LockIcon from "./icons/LockIcon"; // 从单独的文件导入
 import NumberBall from "./icons/NumberBall"; // 导入 NumberBall 组件
 import crypto from "crypto";
 import { PredictionLoading } from "./LoadingAnimation"; // 导入预测加载组件
+import PurchaseLink from "./PurchaseLink"; // 导入购买链接组件
 
 interface AIResultsProps {
   currentDrawNumber: string;
@@ -347,8 +348,12 @@ export default function AIResults({ currentDrawNumber }: AIResultsProps) {
               )}
 
               <p className="mt-6 text-sm text-gray-400">
-                量子预测密钥可在官方指定渠道获取 (¥500/次)
+                理性消费，量力而行，切勿沉迷
               </p>
+
+              <div className="mt-4">
+                <PurchaseLink />
+              </div>
             </form>
           )}
         </div>
