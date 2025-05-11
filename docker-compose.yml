@@ -9,8 +9,10 @@ services:
       - "3000:3000"
     volumes:
       - ./data:/app/data
-    # Add any necessary environment variables here
-    # environment:
-    #   NODE_ENV: production
-    #   MY_API_KEY: your_api_key_here
+    # 添加环境变量设置
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      # 可以在运行时通过.env文件或命令行覆盖此值
+      - ADMIN_KEY=${ADMIN_KEY:-your_secure_admin_key_here}
     restart: unless-stopped

@@ -19,6 +19,8 @@ RUN npm install
 COPY . .
 
 # Build the Next.js application
+# 禁用Next.js遥测数据收集
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 # If you are using yarn, uncomment the next line and comment out the npm run build line
 # RUN yarn build
@@ -30,17 +32,18 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Set environment variables
-# Add any necessary environment variables here
-# ENV NODE_ENV production
-# ENV MY_API_KEY your_api_key_here
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED=1
+# 默认管理员密钥设置为可被覆盖的环境变量
+ENV ADMIN_KEY your_secure_admin_key_here
 
 # Copy built assets from the builder stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
-# If you have a custom server, copy it as well
-# COPY --from=builder /app/server.js ./server.js
+# 确保数据目录存在
+RUN mkdir -p /app/data
 
 # Expose the port the app runs on
 EXPOSE 3000

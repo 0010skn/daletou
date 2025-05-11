@@ -2,12 +2,15 @@ import { redirect } from "next/navigation";
 import { getAdminPanelPath } from "@/lib/adminUtils";
 import AdminPanel from "@/components/AdminPanel";
 
+// 定义页面属性类型
+interface PageProps {
+  params: {
+    adminPath: string;
+  };
+}
+
 // 生成带有元数据的页面
-export async function generateMetadata({
-  params,
-}: {
-  params: { adminPath: string };
-}) {
+export async function generateMetadata({ params }: PageProps) {
   return {
     title: "管理控制面板",
     description: "大乐透分析预测系统管理控制面板",
@@ -19,11 +22,7 @@ export async function generateMetadata({
 }
 
 // 验证访问路径是否正确
-export default async function AdminPage({
-  params,
-}: {
-  params: { adminPath: string };
-}) {
+export default function AdminPage({ params }: PageProps) {
   try {
     // 确保params已经解析完成
     const adminPath = params?.adminPath || "";
@@ -35,7 +34,8 @@ export default async function AdminPage({
     // 进行严格的字符串比较
     if (String(adminPath).trim() !== String(correctPath).trim()) {
       console.log("路径不匹配，重定向到首页");
-      return redirect("/");
+      redirect("/");
+      return null;
     }
 
     console.log("路径匹配，显示管理面板");
@@ -44,6 +44,7 @@ export default async function AdminPage({
   } catch (error) {
     console.error("访问管理面板时出错:", error);
     // 任何错误都重定向到首页
-    return redirect("/");
+    redirect("/");
+    return null;
   }
 }

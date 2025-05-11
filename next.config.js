@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  telemetry: false,
   experimental: {
     serverActions: {
       allowedOrigins: ["localhost:3000"],
