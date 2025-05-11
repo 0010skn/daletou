@@ -29,4 +29,5 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: ghcr.io/0010skn/daletou:latest
