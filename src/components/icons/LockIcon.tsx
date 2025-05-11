@@ -4,7 +4,7 @@ interface IconProps {
   className?: string;
 }
 
-export default function LotteryIcon({ className }: IconProps) {
+export default function LockIcon({ className }: IconProps) {
   return (
     <svg
       className={className}
@@ -15,9 +15,8 @@ export default function LotteryIcon({ className }: IconProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <circle cx="12" cy="12" r="10"></circle>
-      <circle cx="12" cy="12" r="6"></circle>
-      <circle cx="12" cy="12" r="2"></circle>
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
     </svg>
   );
 }

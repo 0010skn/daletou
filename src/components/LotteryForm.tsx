@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Button, Textarea } from "@nextui-org/react";
 import { submitLotteryData } from "@/app/actions";
 import { LotteryFormSchema, eventBus, parseLotteryNumbers } from "@/lib/utils";
-import { LotteryIcon } from "./icons";
+import LotteryIcon from "./icons/LotteryIcon"; // 从单独的文件导入
 import NumberBall from "./icons/NumberBall"; // 导入 NumberBall 组件
 
 type FormData = z.infer<typeof LotteryFormSchema>;
