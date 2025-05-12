@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminLogin from "./AdminLogin";
 import PredictionManager from "./PredictionManager";
+import AdminWelcomeModal from "./AdminWelcomeModal";
 
 interface FileItem {
   name: string;
@@ -34,7 +35,24 @@ export default function AdminPanel() {
   );
   const [keyPrice, setKeyPrice] = useState<string>("29.9");
   const [currentValidKey, setCurrentValidKey] = useState<string>("");
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const router = useRouter();
+
+  // 检查是否应该显示欢迎弹窗
+  useEffect(() => {
+    if (isAuthenticated) {
+      const hasSeenWelcomeModal = localStorage.getItem("admin_welcome_seen");
+      if (!hasSeenWelcomeModal) {
+        setShowWelcomeModal(true);
+      }
+    }
+  }, [isAuthenticated]);
+
+  // 处理关闭欢迎弹窗
+  const handleCloseWelcomeModal = () => {
+    localStorage.setItem("admin_welcome_seen", "true");
+    setShowWelcomeModal(false);
+  };
 
   // 认证成功的回调
   const handleLoginSuccess = () => {
@@ -1071,6 +1089,9 @@ export default function AdminPanel() {
 
   return (
     <div className="min-h-screen py-8 px-4 bg-gray-900">
+      {showWelcomeModal && (
+        <AdminWelcomeModal onClose={handleCloseWelcomeModal} />
+      )}
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-white">管理控制面板</h1>

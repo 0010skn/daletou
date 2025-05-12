@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // 禁用Next.js遥测数据收集
+  telemetry: false,
   typescript: {
     ignoreBuildErrors: true,
   },
